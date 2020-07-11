@@ -159,21 +159,15 @@ export class CanvasRenderer {
     }
 
     private createFontStyle(styles: CSSParsedDeclaration): string[] {
-        const fontVariant = styles.fontVariant
-            .filter(variant => variant === 'normal' || variant === 'small-caps')
-            .join('');
+        const fontVariant = styles.fontVariant.filter(variant => variant === 'normal' || variant === 'small-caps').join('');
         const fontFamily = styles.fontFamily.map(fontName => {
-            return fontName.indexOf(' ') === -1 ? fontName : `"${fontName}"`;
+            return `${fontName}`;
+            //return fontName;
+            //return fontName.indexOf(' ') === -1 ? fontName : `"${fontName}"`;
         }).join(', ');
-        const fontSize = isDimensionToken(styles.fontSize)
-            ? `${styles.fontSize.number}${styles.fontSize.unit}`
-            : `${styles.fontSize.number}px`;
+        const fontSize = isDimensionToken(styles.fontSize) ? `${styles.fontSize.number}${styles.fontSize.unit}` : `${styles.fontSize.number}px`;
 
-        return [
-            [styles.fontStyle, fontVariant, styles.fontWeight, fontSize, fontFamily].join(' '),
-            fontFamily,
-            fontSize
-        ];
+        return [ [styles.fontStyle, fontVariant, styles.fontWeight, fontSize, fontFamily].join(' '), fontFamily, fontSize];
     }
 
     async renderTextNode(text: TextContainer, styles: CSSParsedDeclaration) {

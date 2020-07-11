@@ -1,4 +1,4 @@
-import {Bounds, parseBounds, parseDocumentSize} from './css/layout/bounds';
+import {parseBounds, parseDocumentSize} from './css/layout/bounds';
 import {color, Color, COLORS, isTransparent} from './css/types/color';
 import {Parser} from './css/syntax/parser';
 import {CloneOptions, DocumentCloner} from './dom/document-cloner';
@@ -76,7 +76,7 @@ const renderElement = async (element: HTMLElement, opts: Partial<Options>): Prom
 
     const options: Options = {...defaultOptions, ...resourceOptions, ...opts};
 
-    const windowBounds = new Bounds(options.scrollX, options.scrollY, options.windowWidth, options.windowHeight);
+    //const windowBounds = new Bounds(options.scrollX, options.scrollY, options.windowWidth, options.windowHeight);
 
     Logger.create({id: instanceName, enabled: options.logging});
     Logger.getInstance(instanceName).debug(`Starting document clone`);
@@ -87,12 +87,15 @@ const renderElement = async (element: HTMLElement, opts: Partial<Options>): Prom
         inlineImages: options.foreignObjectRendering,
         copyStyles: options.foreignObjectRendering
     });
-    const clonedElement = documentCloner.clonedReferenceElement;
+    const clonedElement = documentCloner.documentElement;
+    clonedElement.classList.add('super-pdf-clone');
+    document.body.appendChild(clonedElement);
+    //const clonedElement = documentCloner.clonedReferenceElement;
+    //const clonedElement = documentCloner.referenceElement;
     if (!clonedElement) {
         return Promise.reject(`Unable to find element in cloned iframe`);
     }
-
-    const container = await documentCloner.toIFrame(ownerDocument, windowBounds);
+    //const container = await documentCloner.toIFrame(ownerDocument, windowBounds);
 
     // http://www.w3.org/TR/css3-background/#special-backgrounds
     const documentBackgroundColor = ownerDocument.documentElement
@@ -105,7 +108,7 @@ const renderElement = async (element: HTMLElement, opts: Partial<Options>): Prom
     const bgColor = opts.backgroundColor;
     const defaultBackgroundColor =
         typeof bgColor === 'string' ? parseColor(bgColor) : bgColor === null ? COLORS.TRANSPARENT : 0xffffffff;
-
+    
     const backgroundColor =
         element === ownerDocument.documentElement
             ? isTransparent(documentBackgroundColor)
@@ -115,6 +118,8 @@ const renderElement = async (element: HTMLElement, opts: Partial<Options>): Prom
                 : documentBackgroundColor
             : defaultBackgroundColor;
 
+
+    console.log(backgroundColor);
     const renderOptions = {
         id: instanceName,
         cache: options.cache,
@@ -154,11 +159,13 @@ const renderElement = async (element: HTMLElement, opts: Partial<Options>): Prom
         const renderer = new CanvasRenderer(renderOptions);
         canvas = await renderer.render(root);
     }
+    
+    clonedElement.remove();
 
     if (options.removeContainer === true) {
-        if (!DocumentCloner.destroy(container)) {
-            Logger.getInstance(instanceName).error(`Cannot detach cloned iframe as it is not in the DOM anymore`);
-        }
+        //if (!DocumentCloner.destroy(container)) {
+        //    Logger.getInstance(instanceName).error(`Cannot detach cloned iframe as it is not in the DOM anymore`);
+        //}
     }
 
     Logger.getInstance(instanceName).debug(`Finished rendering`);

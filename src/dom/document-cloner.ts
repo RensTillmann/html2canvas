@@ -39,9 +39,9 @@ const IGNORE_ATTRIBUTE = 'data-html2canvas-ignore';
 export class DocumentCloner {
     private readonly scrolledElements: [Element, number, number][];
     private readonly options: CloneConfigurations;
-    private readonly referenceElement: HTMLElement;
+    public readonly referenceElement: HTMLElement;
     clonedReferenceElement?: HTMLElement;
-    private readonly documentElement: HTMLElement;
+    public readonly documentElement: HTMLElement;
     private readonly counters: CounterState;
     private quoteDepth: number;
 
@@ -55,7 +55,7 @@ export class DocumentCloner {
             throw new Error('Cloned element does not have an owner document');
         }
 
-        this.documentElement = this.cloneNode(element.ownerDocument.documentElement) as HTMLElement;
+        this.documentElement = this.cloneNode(element) as HTMLElement;
     }
 
     toIFrame(ownerDocument: Document, windowSize: Bounds): Promise<HTMLIFrameElement> {
